@@ -97,9 +97,16 @@ int contDeck = 0;
 
 void ImprimirDeck(Deck &deck) // pede um deck e imprime as informações dele
 {
-    for (int i = 0; i < deck.final + 1; i++)
+    for (int i = 0; i < TamanhoDeck; i++)
     {
-        std::cout << "Carta " << i + 1 << ": " << deck.CartasDoDeck[i]["nome"] << std::endl;
+        if (deck.CartasDoDeck[i].contains("nome"))
+        {
+            std::cout << "Carta " << i + 1 << ": " << deck.CartasDoDeck[i]["nome"].get<std::string>() << std::endl;
+        }
+        else
+        {
+            std::cout << "Carta " << i + 1 << ": X" << std::endl;
+        }
     }
     std::cout << "Peso: " << deck.peso << std::endl;
 }
@@ -208,6 +215,8 @@ Deck GerarXBesta(const json &listadecartas)
     return Xbesta;
 }
 
+// 2 Remover em K
+
 int VerificacaoString(std::string l)
 {
     int k;
@@ -227,59 +236,58 @@ int VerificacaoString(std::string l)
     return k;
 }
 
-int VerificacaoCompleta1a8(std::string l)
-{
-    int k = VerificacaoString(l);
-    while (k > 8 || k < 1)
-    {
-        std::cout << "Favor inserir um numero entre 1 e 8: " << std::endl;
-        std::cin >> l;
-        k = VerificacaoString(l);
-    }
-    return k;
-}
-
-// 2 Remover em K
-
 bool RemoverEmK(Deck &deck)
 {
     sinal = false;
-    if (deck.final > -1)
+    std::string l;
+    if (deck.final < 0)
     {
-        std::cout << "Informe a posicao da carta que gostaria de retirar do deck" << std::endl;
-        std::cin >> l;
-        int k = VerificacaoCompleta1a8(l);
+        std::cout << "Deck nao existe" << std::endl;
+        return sinal;
+    }
+    std::cout << "Informe uma posicao para remover" << std::endl;
+    std::cin >> l;
+    int k = VerificacaoString(l);
 
-        std::cout << "Confirmar retirada da carta " << k << " Nome:" << deck.CartasDoDeck[k - 1]["nome"] << " Elixir:" << deck.CartasDoDeck[k - 1]["elixir"]
-                  << " do seu deck? (S/n)" << std::endl;
-        std::cin >> conf;
-        if (conf == 'S')
+    while (true)
+    {
+        if (k < 1 || k > deck.final + 1)
         {
-            aux = k - 1;
-            while (aux < deck.final)
-            {
-                deck.CartasDoDeck[aux] = deck.CartasDoDeck[aux + 1];
-                aux++;
-            }
-            deck.final--;
-            CalculaPeso(deck);
-            sinal = true;
+            std::cout << "Favor, inserir um numero de 1 a " << deck.final + 1 << ": " << std::endl;
+            std::cin >> l;
+            k = VerificacaoString(l);
         }
         else
         {
-            std::cout << "Confirmacao negada" << std::endl;
+            break;
         }
     }
-    else
+
+    std::cout << "Confirmar retirada da carta " << k << "\n"
+              << " Nome: " << deck.CartasDoDeck[k - 1]["nome"].get<std::string>() << "\n"
+              << " Elixir: " << deck.CartasDoDeck[k - 1]["elixir"].get<int>()
+              << " do seu deck? (S/n)" << std::endl;
+    std::cin >> conf;
+    if (conf == 'S')
     {
-        std::cout << "Deck escolhido nao e valido" << std::endl;
+        aux = k - 1;
+        while (aux <= deck.final)
+        {
+            deck.CartasDoDeck[aux] = deck.CartasDoDeck[aux + 1];
+            aux++;
+        }
+        deck.final--;
+        sinal = true;
+
+        ImprimirDeck(deck);
+        // TODO implementar CalculaPeso(deck) propriamente
     }
     return sinal;
 }
 
-int ProcurarNO(std::string k, Deck deckProcurado)
+int ProcurarNO(std::string &k, const Deck &deckProcurado)
 {
-    for (int i = 0; i < TamanhoDeck; i++)
+    for (int i = 0; i <= deckProcurado.final; i++)
     {
         if (deckProcurado.CartasDoDeck[i]["nome"] == k)
         {
@@ -287,10 +295,10 @@ int ProcurarNO(std::string k, Deck deckProcurado)
         }
     }
     std::cout << "Nome inserido nao existe no deck" << std::endl;
-    return 0;
+    return -1;
 }
 
-void AlterarPosteriorK(Deck &deck, const json &listadecartas)
+bool AlterarPosteriorK(Deck &deck, const json &listadecartas)
 {
     std::string nome;
     sinal = false;
@@ -307,7 +315,7 @@ void AlterarPosteriorK(Deck &deck, const json &listadecartas)
                 std::getline(std::cin, nome);
                 k = ProcurarNO(nome, deck);
             }
-            else if (k == deck.final)
+            else if (k == TamanhoDeck)
             {
                 std::cout << "Carta encontrada, porem nao e impossivel altarar a carta posteiror, isira o nome novamnte: " << std::endl;
                 std::getline(std::cin, nome);
@@ -318,7 +326,6 @@ void AlterarPosteriorK(Deck &deck, const json &listadecartas)
                 break;
             }
         }
-
         std::cout << "Carta encontrada: " << deck.CartasDoDeck[k]["nome"] << std::endl;
         std::cout << "Deseja prosseguir com a alteracao da carta posterior: " << deck.CartasDoDeck[k + 1]["nome"] << " posicao: " << k + 1 << "? (S/n)" << std::endl;
         std::cin >> conf;
@@ -345,12 +352,79 @@ void AlterarPosteriorK(Deck &deck, const json &listadecartas)
             deck.CartasDoDeck[k + 1] = novaCarta;
             CalculaPeso(deck);
             ImprimirDeck(deck);
+            sinal = true;
         }
         else
         {
             std::cout << "Alteracao negada" << std::endl;
         }
     }
+    return sinal;
+}
+
+bool InserirposteriorK(Deck &deck, const json &listadecartas)
+{
+    sinal = false;
+
+    if (deck.final >= TamanhoDeck - 1)
+    {
+        std::cout << "Overflow!!! O deck ja esta cheio. Nao e possivel inserir." << std::endl;
+        return false;
+    }
+
+    if (deck.final < 0)
+    {
+        std::cout << "deck nao existe" << std::endl;
+        return false;
+    }
+
+    std::string nome;
+    std::cout << "Informe a carta que deseja procurar: ";
+    std::getline(std::cin, nome);
+    int k = ProcurarNO(nome, deck);
+
+    while (k == -1)
+    {
+        std::cerr << "Por favor, insira o nome novamente: " << std::endl;
+        std::getline(std::cin, nome);
+        k = ProcurarNO(nome, deck);
+    }
+
+    std::cout << "Carta encontrada: " << deck.CartasDoDeck[k]["nome"] << std::endl;
+    std::cout << "Deseja prosseguir com a insercao na posicao posterior " << k + 1 << "? (S/n)" << std::endl;
+    std::cin >> conf;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Limpa o buffer
+
+    if (toupper(conf) == 'S')
+    {
+        std::cout << "Infome o nome da carta que deseja inserir: " << std::endl;
+        std::getline(std::cin, nome);
+        json novaCarta = ProcurarCarta(listadecartas, nome);
+
+        while (novaCarta.is_null() || novaCarta.empty())
+        {
+            std::cerr << "Insira o nome da carta que deseja inserir novamente: " << std::endl;
+            std::getline(std::cin, nome);
+            novaCarta = ProcurarCarta(listadecartas, nome);
+        }
+
+        for (int i = deck.final; i >= k + 1; i--)
+        {
+            deck.CartasDoDeck[i + 1] = deck.CartasDoDeck[i];
+        }
+
+        deck.CartasDoDeck[k + 1] = novaCarta;
+        deck.final++;
+        sinal = true;
+        CalculaPeso(deck);
+        ImprimirDeck(deck);
+    }
+    else
+    {
+        std::cout << "Insercao cancelada." << std::endl;
+    }
+
+    return sinal;
 }
 
 int main()
@@ -358,7 +432,7 @@ int main()
 {
     json listaDeCartas = CarregarCartas();
     Deck logbait = GerarLogBait(listaDeCartas);
-    AlterarPosteriorK(logbait, listaDeCartas);
+    RemoverEmK(logbait);
 
     return 0;
 }
