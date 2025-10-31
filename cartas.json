@@ -498,7 +498,7 @@
   },
   {
     "id": 72,
-    "nome": "quebra-muros",
+    "nome": "quebra muros",
     "raridade": "epica",
     "elixir": 2,
     "tipo": "t"
@@ -596,7 +596,7 @@
   },
   {
     "id": 86,
-    "nome": "megacavaleiro",
+    "nome": "mega cavaleiro",
     "raridade": "lendaria",
     "elixir": 7,
     "tipo": "t"
@@ -688,6 +688,27 @@
     {
     "id": 99,
     "nome": "barril de barbaro",
+    "raridade": "epica",
+    "elixir": 2,
+    "tipo": "f"
+  },
+ {
+    "id": 100,
+    "nome": "goblin com dardo",
+    "raridade": "rara",
+    "elixir": 3,
+    "tipo": "t"
+  },
+  {
+    "id": 101,
+    "nome": "arbusto suspeito",
+    "raridade": "rara",
+    "elixir": 2,
+    "tipo": "t"
+  },
+  {
+    "id": 102,
+    "nome": "maldicao goblin",
     "raridade": "epica",
     "elixir": 2,
     "tipo": "f"
