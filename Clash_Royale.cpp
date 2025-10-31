@@ -70,11 +70,25 @@ json ProcurarCarta(const json &listadecartas, std::string n)
 
 void ImprimirCarta(const json &carta) // pede somente uma carta e imprime suas informações
 {
+    std::cout << "============================================================" << std::endl;
     std::cout << "ID: " << carta["id"] << std::endl;
     std::cout << "Nome: " << carta["nome"] << std::endl;
     std::cout << "Elixir: " << carta["elixir"] << std::endl;
     std::cout << "Raridade: " << carta["raridade"] << std::endl;
-    std::cout << "Tipo: " << carta["tipo"] << std::endl;
+    if (carta["tipo"] == "t")
+    {
+        std::cout << "Tipo: Tropa" << std::endl;
+    }
+    else if (carta["tipo"] == "f")
+    {
+        std::cout << "Tipo: Feitico" << std::endl;
+    }
+    else if (carta["tipo"] == "c")
+    {
+        std::cout << "Tipo: Contrucao" << std::endl;
+    }
+
+    std::cout << "============================================================" << std::endl;
 }
 
 // 1- Definir Estrutura
@@ -97,6 +111,7 @@ int contDeck = 0;
 
 void ImprimirDeck(Deck &deck) // pede um deck e imprime as informações dele
 {
+    std::cout << "=============================================================" << std::endl;
     for (int i = 0; i < TamanhoDeck; i++)
     {
         if (deck.CartasDoDeck[i].contains("nome"))
@@ -109,6 +124,7 @@ void ImprimirDeck(Deck &deck) // pede um deck e imprime as informações dele
         }
     }
     std::cout << "Peso: " << deck.peso << std::endl;
+    std::cout << "=============================================================" << std::endl;
 }
 
 void CalculaPeso(Deck &deck) // pede um deck e calcula o peso dele
@@ -135,59 +151,68 @@ void CalculaPeso(Deck &deck) // pede um deck e calcula o peso dele
     // faz com que fique com uma casa decimal, multiplicando por 10 primeiro e arredondando, depois divide pra voltar
 }
 
-Deck CriarDeck(const json &listadecarta) // passa a lista de carta e começa o processo pra criar o deck
+json VerificarRepitida(std::string nome, Deck &novodeck, const json &listadecartas)
 {
-    Deck novodeck;
-    std::string nome;
-    std::cout << "========== Comecando Montagem de Deck ==========" << std::endl;
-    for (int i = 0; i < TamanhoDeck; i++)
+    json novaCarta;
+    bool cartaOk = false;
+
+    while (!cartaOk)
     {
-        std::cout << "Informe o nome da carta " << i + 1 << " do seu novo deck: " << std::endl;
-        std::getline(std::cin, nome); // pega a linha toda e não só a proxima palavra
-        for (char &c : nome)          // for each passando por todas as letras do nome passado pra deixar elas em minusculo
+        novaCarta = ProcurarCarta(listadecartas, nome);
+        if (novaCarta.is_null() || novaCarta.empty())
         {
-            c = tolower(c);
+            std::cerr << " A Carta '" << nome << " nao existe, insra o nome novamente: " << std::endl;
+            std::getline(std::cin, nome);
+            continue;
         }
-        novodeck.CartasDoDeck[i] = ProcurarCarta(listadecarta, nome);
-        // usa o método de procurar carta pra armazenar no array de cartas do deck
-        if (novodeck.CartasDoDeck[i] == json()) // verificação caso passe uma json nulo
+
+        bool Repetida = false;
+        for (int i = 0; i <= novodeck.final; i++)
         {
-            while (novodeck.CartasDoDeck[i] == json()) // repete o processo até não ser mais um json vaizo
+            if (novodeck.CartasDoDeck[i].contains("nome") &&
+                novodeck.CartasDoDeck[i]["nome"].get<std::string>() == nome)
             {
-                std::cout << "Insira novamente a carta " << i + 1 << " do seu deck: " << std::endl;
-                std::getline(std::cin, nome);
-                for (char &c : nome)
-                {
-                    c = tolower(c);
-                }
-                novodeck.CartasDoDeck[i] = ProcurarCarta(listadecarta, nome);
+                Repetida = true;
+                break;
             }
         }
 
-        for (int j = 0; j < i; j++) // percorre o deck e verifica se tem carta repitida
+        if (Repetida)
         {
-            if (novodeck.CartasDoDeck[i] == novodeck.CartasDoDeck[j]) // se tiver repete até não ter
-            {
-                std::cout << "Voce ja possui essa carta em seu deck!" << std::endl;
-                while (novodeck.CartasDoDeck[i] == novodeck.CartasDoDeck[j])
-                {
-                    std::cout << "Insira novamente a carta " << i + 1 << " do seu deck: " << std::endl;
-                    std::getline(std::cin, nome);
-                    for (char &c : nome)
-                    {
-                        c = tolower(c);
-                    }
-                    novodeck.CartasDoDeck[i] = ProcurarCarta(listadecarta, nome);
-                }
-            }
+            std::cerr << "ERRO: Voce ja possui a carta '" << nome << "' no deck. Tente novamente: " << std::endl;
+            std::getline(std::cin, nome);
+            continue;
         }
+        cartaOk = true;
+    }
+
+    return novaCarta;
+}
+
+Deck CriarDeck(const json &listadecarta) // passa a lista de carta e começa o processo pra criar o deck
+{
+    Deck novodeck;
+    // IMPORTANTE: Inicializa o 'final' para -1 (deck vazio)
+    // Isso é crucial para a função de verificação de duplicatas funcionar
+    novodeck.final = -1;
+
+    std::string nome;
+
+    std::cout << "========== Comecando Montagem de Deck ==========" << std::endl;
+
+    for (int i = 0; i < TamanhoDeck; i++)
+    {
+        std::cout << "Informe o nome da carta " << i + 1 << " do seu novo deck: " << std::endl;
+        std::getline(std::cin, nome); // pega a linha toda
+        json cartaValidada = VerificarRepitida(nome, novodeck, listadecarta);
+        novodeck.CartasDoDeck[i] = cartaValidada;
+        novodeck.final = i;
     }
     contDeck++;
-    CalculaPeso(novodeck);  // atribui o peso ao deck
-    ImprimirDeck(novodeck); // imprime ele
+    CalculaPeso(novodeck);
+    ImprimirDeck(novodeck);
     listaDeck[contDeck] = novodeck;
-    novodeck.final = 7;
-    return novodeck; // retorna ele
+    return novodeck;
 }
 
 Deck GerarLogBait(const json &listadecartas)
@@ -254,48 +279,6 @@ json verificarVoid(std::string &nome, const json &listadecartas)
         std::getline(std::cin, nome);
         novaCarta = ProcurarCarta(listadecartas, nome);
     }
-    return novaCarta;
-}
-
-json VerificarRepitida(Deck &deckProcurado, const json &listadecartas)
-{
-    std::string nome;
-    json novaCarta;
-    bool cartaOk = false;
-    while (!cartaOk)
-    {
-        std::cout << "Por favor, informe o nome da carta: ";
-        std::getline(std::cin, nome);
-
-        novaCarta = ProcurarCarta(listadecartas, nome);
-        if (novaCarta.is_null() || novaCarta.empty())
-        {
-            std::cerr << "Insira o nome da carta que deseja inserir novamente:" << std::endl;
-            continue;
-        }
-
-        bool isRepetida = false;
-
-        for (int i = 0; i <= deckProcurado.final; i++)
-        {
-
-            if (deckProcurado.CartasDoDeck[i].contains("nome") &&
-                deckProcurado.CartasDoDeck[i]["nome"] == nome)
-            {
-                isRepetida = true;
-                break;
-            }
-        }
-
-        if (isRepetida)
-        {
-            std::cerr << "Voce ja possui essa carta em seu deck, insira o nome da carta novamente." << std::endl;
-            continue;
-        }
-
-        cartaOk = true;
-    }
-
     return novaCarta;
 }
 
@@ -453,8 +436,9 @@ bool InserirposteriorK(Deck &deck, const json &listadecartas)
 
     if (toupper(conf) == 'S')
     {
-
-        json novaCarta = VerificarRepitida(deck, listadecartas);
+        std::cout << "Insira o nome da carta que deseja inserir: " << std::endl;
+        std::getline(std::cin, nome);
+        json novaCarta = VerificarRepitida(nome, deck, listadecartas);
 
         for (int i = deck.final; i >= k + 1; i--)
         {
@@ -475,13 +459,57 @@ bool InserirposteriorK(Deck &deck, const json &listadecartas)
     return sinal;
 }
 
+bool imprimirNoAnterior(Deck &deck, const json &listadecartas)
+{
+    std::string nome;
+    sinal = false;
+    if (deck.final < 0)
+    {
+        std::cout << "deck nao existe" << std::endl;
+        return sinal;
+    }
+
+    std::cout << "Insira o nome da carta que gostaria de verificar: " << std::endl;
+    std::getline(std::cin, nome);
+    int k = ProcurarNO(nome, deck);
+    if (k == -1)
+    {
+        std::cout << "Gostaria de iserir o nome novamnte? (S/n)" << std::endl;
+        std::cin >> conf;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        while (conf == 'S')
+        {
+            std::cout << "Insira o nome da carta que gostaria de verificar: " << std::endl;
+            std::getline(std::cin, nome);
+            int k = ProcurarNO(nome, deck);
+            if (k == -1)
+            {
+                std::cout << "Gostaria de iserir o nome novamnte? (S/n)" << std::endl;
+                std::cin >> conf;
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            }
+            else
+            {
+                break;
+            }
+        }
+        if (conf != 'S')
+        {
+            std::cout << "encerrando busca..." << std::endl;
+            return sinal = true;
+        }
+    }
+    std::cout << "Carta encontrada!" << std::endl;
+    std::cout << "Imprimindo conteudo da carta anterior: " << std::endl;
+    ImprimirCarta(deck.CartasDoDeck[k - 1]);
+}
+
 int main()
 
 {
     json listaDeCartas = CarregarCartas();
-    Deck logbait = GerarLogBait(listaDeCartas);
-    RemoverEmK(logbait);
-    InserirposteriorK(logbait, listaDeCartas);
+    Deck LogBait = GerarLogBait(listaDeCartas);
+    imprimirNoAnterior(LogBait, listaDeCartas);
 
     return 0;
 }
