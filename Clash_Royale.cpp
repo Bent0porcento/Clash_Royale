@@ -508,8 +508,11 @@ int main()
 
 {
     json listaDeCartas = CarregarCartas();
-    Deck LogBait = GerarLogBait(listaDeCartas);
-    imprimirNoAnterior(LogBait, listaDeCartas);
+    std::cout << "======================================================================" << std::endl;
+    std::cout << "          Bem vindo ao gerenciador de decks do Clash Royale           " << std::endl;
+    std::cout << "======================================================================" << std::endl;
+
+    std::cout << "/* message */" << std::endl;
 
     return 0;
 }
