@@ -192,8 +192,6 @@ json VerificarRepitida(std::string nome, Deck &novodeck, const json &listadecart
 Deck CriarDeck(const json &listadecarta) // passa a lista de carta e começa o processo pra criar o deck
 {
     Deck novodeck;
-    // IMPORTANTE: Inicializa o 'final' para -1 (deck vazio)
-    // Isso é crucial para a função de verificação de duplicatas funcionar
     novodeck.final = -1;
 
     std::string nome;
