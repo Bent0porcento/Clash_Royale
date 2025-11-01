@@ -9,6 +9,14 @@
 using json = nlohmann::json;
 // Paricido com std, serve pra não ficar escrevendo nlohmann::json toda vez quer quiser usar o tipo json
 
+void ClearScreen()
+{
+    for (int i = 0; i < 50; ++i)
+    {
+        std::cout << std::endl;
+    }
+}
+
 json CarregarCartas()
 {
     std::ifstream arquivo_json("cartas.json"); // abrir o json
@@ -98,6 +106,7 @@ int TamanhoDeck = 8;
 struct Deck
 {
     json CartasDoDeck[8];
+    std::string nome;
     double peso;
     int final = -1;
 };
@@ -192,8 +201,6 @@ json VerificarRepitida(std::string nome, Deck &novodeck, const json &listadecart
 Deck CriarDeck(const json &listadecarta) // passa a lista de carta e começa o processo pra criar o deck
 {
     Deck novodeck;
-    // IMPORTANTE: Inicializa o 'final' para -1 (deck vazio)
-    // Isso é crucial para a função de verificação de duplicatas funcionar
     novodeck.final = -1;
 
     std::string nome;
@@ -211,6 +218,9 @@ Deck CriarDeck(const json &listadecarta) // passa a lista de carta e começa o p
     contDeck++;
     CalculaPeso(novodeck);
     ImprimirDeck(novodeck);
+    std::cout << "Como gostaria de chamar seu novo deck?" << std::endl;
+    std::getline(std::cin, nome);
+    novodeck.nome = nome;
     listaDeck[contDeck] = novodeck;
     return novodeck;
 }
@@ -227,8 +237,8 @@ Deck GerarLogBait(const json &listadecartas)
     logbait.CartasDoDeck[6] = ProcurarCarta(listadecartas, "gangue de goblins");
     logbait.CartasDoDeck[7] = ProcurarCarta(listadecartas, "espirito de gelo");
     logbait.final = TamanhoDeck - 1;
+    logbait.nome = "logbait";
     CalculaPeso(logbait);
-    ImprimirDeck(logbait);
     return logbait;
 }
 
@@ -244,8 +254,8 @@ Deck GerarXBesta(const json &listadecartas)
     Xbesta.CartasDoDeck[6] = ProcurarCarta(listadecartas, "esqueletos");
     Xbesta.CartasDoDeck[7] = ProcurarCarta(listadecartas, "tornado");
     Xbesta.final = TamanhoDeck - 1;
+    Xbesta.nome = "X-Besta";
     CalculaPeso(Xbesta);
-    ImprimirDeck(Xbesta);
     return Xbesta;
 }
 
@@ -507,12 +517,41 @@ bool imprimirNoAnterior(Deck &deck, const json &listadecartas)
 int main()
 
 {
+    int op;
     json listaDeCartas = CarregarCartas();
+    Deck bait = GerarLogBait(listaDeCartas);
     std::cout << "======================================================================" << std::endl;
     std::cout << "          Bem vindo ao gerenciador de decks do Clash Royale           " << std::endl;
     std::cout << "======================================================================" << std::endl;
 
-    std::cout << "/* message */" << std::endl;
+    std::cout << "1) Remover uma Carta" << std::endl;
+    std::cout << "2) Procurar uma Carta e alterar a carta anterior" << std::endl;
+    std::cout << "3) Procurar uma Carta e inserir na posicao anterior" << std::endl;
+    std::cout << "4) Procurar uma carta por nome e imprmir a anterior" << std::endl;
+    std::cout << "5) Imprimir quantas cartas custam mais que 7 de elixir" << std::endl;
+    std::cout << "6) Procurar uma carta pela raridade e alterar a carta posterior" << std::endl;
+    std::cout << "7) Classificar um deck por tamanho de nome" << std::endl;
+    std::cout << "8) Imprimir um deck ou a lsita de cartas" << std::endl;
+    std::cout << "9) Imprimir todas as cartas que custam menos que 4 e mais que 8 de elixir" << std::endl;
+    std::cout << "10) Procurar cartas por tipo" << std::endl;
+    std::cout << "11) Inserir uma carta carta na posicao X+2" << std::endl;
+    std::cout << "12) Procurar uma carta por nome e remover na posicao K-2" << std::endl;
+    std::cout << "13) Classificar um deck por ordem crescente de raridade" << std::endl;
+    std::cin >> op;
+
+    switch (op)
+    {
+    case 1:
+        std::cout << "\n"
+                  << std::endl;
+        std::cout << "Escolha o deck para realizar a acao" << std::endl;
+        std::cout << "\n"
+                  << std::endl;
+        break;
+
+    default:
+        break;
+    }
 
     return 0;
 }
