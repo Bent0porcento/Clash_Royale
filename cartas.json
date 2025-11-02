@@ -705,5 +705,12 @@
     "raridade": "epica",
     "elixir": 2,
     "tipo": "f"
+  },
+   {
+    "id": 103,
+    "nome": "torre de bombas",
+    "raridade": "rara",
+    "elixir": 4,
+    "tipo": "c"
   }
 ]
