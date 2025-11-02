@@ -469,13 +469,6 @@
     "tipo": "f"
   },
   {
-    "id": 68,
-    "nome": "espelho",
-    "raridade": "epica",
-    "elixir": "0",
-    "tipo": "f"
-  },
-  {
     "id": 69,
     "nome": "barril de goblins",
     "raridade": "epica",
@@ -485,7 +478,7 @@
   {
     "id": 70,
     "nome": "gangue de goblins",
-    "raridade": "epica",
+    "raridade": "comum",
     "elixir": 3,
     "tipo": "t"
   },

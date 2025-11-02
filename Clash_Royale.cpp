@@ -40,42 +40,6 @@ json CarregarCartas()
     return dados_cartas; // retona pra gente o dodos_cartas, equivalente a lista de cartas
 }
 
-void ImprimirCartas(const json &listadecartas)
-// exige que passamos um json para poder ler, no nosso caso é o json com as cartas
-{
-    std::cout << "--- Catalogo de Cartas do Clash Royale ---" << std::endl
-              << std::endl;
-
-    for (const auto &carta : listadecartas) // imprime as carta de acordo com as infomarções que ele puxa do json
-    {
-        int id = carta["id"]; // guarda cada informação das cartas em uma variavel para imprimir dps
-        std::string nome = carta["nome"];
-        // talvez daria pra imprimir direto sem colocar em uma variavel mas n tenho certeza
-        std::string raridade = carta["raridade"];
-        std::string tipo = carta["tipo"];
-
-        std::cout << "ID: " << id << std::endl;
-        std::cout << "Nome: " << nome << std::endl; // impressões
-        std::cout << "Raridade: " << raridade << std::endl;
-        std::cout << "Tipo: " << tipo << std::endl;
-        std::cout << "----------------------------------------" << std::endl;
-    }
-}
-
-json ProcurarCarta(const json &listadecartas, std::string n)
-// exige a lista de carta e uma string, essa string é o nome da carta que a gente quer
-{
-    for (const auto &c : listadecartas) // percorre todo o array
-    {
-        if (c["nome"] == n)
-        {
-            return c; // quando acha a carta que tem o nome igual, retorna ela saindo do looping
-        }
-    }
-    std::cout << "Impossivel Encontrar sua carta" << std::endl;
-    return json(); // se nao achar a carta retorna um jason vazio
-}
-
 void ImprimirCarta(const json &carta) // pede somente uma carta e imprime suas informações
 {
     std::cout << "============================================================" << std::endl;
@@ -99,9 +63,35 @@ void ImprimirCarta(const json &carta) // pede somente uma carta e imprime suas i
     std::cout << "============================================================" << std::endl;
 }
 
+void ImprimirCartas(const json &listadecartas)
+// exige que passamos um json para poder ler, no nosso caso é o json com as cartas
+{
+    std::cout << "--- Catalogo de Cartas do Clash Royale ---" << std::endl
+              << std::endl;
+
+    for (const auto &carta : listadecartas) // imprime as carta de acordo com as infomarções que ele puxa do json
+    {
+        ImprimirCarta(carta);
+    }
+}
+
+json ProcurarCarta(const json &listadecartas, std::string n)
+// exige a lista de carta e uma string, essa string é o nome da carta que a gente quer
+{
+    for (const auto &c : listadecartas) // percorre todo o array
+    {
+        if (c["nome"] == n)
+        {
+            return c; // quando acha a carta que tem o nome igual, retorna ela saindo do looping
+        }
+    }
+    std::cout << "Impossivel Encontrar sua carta" << std::endl;
+    return json(); // se nao achar a carta retorna um jason vazio
+}
+
 // 1- Definir Estrutura
 
-int TamanhoDeck = 8;
+const int TamanhoDeck = 8;
 
 struct Deck
 {
@@ -215,13 +205,13 @@ Deck CriarDeck(const json &listadecarta) // passa a lista de carta e começa o p
         novodeck.CartasDoDeck[i] = cartaValidada;
         novodeck.final = i;
     }
-    contDeck++;
     CalculaPeso(novodeck);
     ImprimirDeck(novodeck);
     std::cout << "Como gostaria de chamar seu novo deck?" << std::endl;
     std::getline(std::cin, nome);
     novodeck.nome = nome;
     listaDeck[contDeck] = novodeck;
+    contDeck++;
     return novodeck;
 }
 
@@ -239,6 +229,9 @@ Deck GerarLogBait(const json &listadecartas)
     logbait.final = TamanhoDeck - 1;
     logbait.nome = "logbait";
     CalculaPeso(logbait);
+    listaDeck[contDeck] = logbait;
+    contDeck++;
+
     return logbait;
 }
 
@@ -256,6 +249,9 @@ Deck GerarXBesta(const json &listadecartas)
     Xbesta.final = TamanhoDeck - 1;
     Xbesta.nome = "X-Besta";
     CalculaPeso(Xbesta);
+    listaDeck[contDeck] = Xbesta;
+    contDeck++;
+
     return Xbesta;
 }
 
@@ -514,12 +510,94 @@ bool imprimirNoAnterior(Deck &deck, const json &listadecartas)
     ImprimirCarta(deck.CartasDoDeck[k - 1]);
 }
 
+void Imprimir7(const json &listadecartas)
+{
+    {
+        for (const auto &carta : listadecartas) // imprime as carta de acordo com as infomarções que ele puxa do json
+        {
+            if (carta["elixir"] > 7)
+            {
+                ImprimirCarta(carta);
+            }
+        }
+    }
+}
+
+bool Raridade(Deck &deck, const json &listadecartas)
+{
+    std::string k;
+    sinal = false;
+    int posicao[TamanhoDeck];
+    json CartasEncontradas[TamanhoDeck];
+    int contcarta = 0;
+    if (deck.final < -1)
+    {
+        std::cout << "Deck inexistente" << std::endl;
+        return sinal;
+    }
+
+    std::cout << "Digite uma raridade para procurar: " << std::endl;
+    std::cin >> k;
+
+    for (int i = 0; i <= deck.final; i++)
+    {
+        if (deck.CartasDoDeck[i]["raridade"] == k)
+        {
+            CartasEncontradas[contcarta] = deck.CartasDoDeck[i];
+            posicao[contcarta] = i;
+            contcarta++;
+        }
+    }
+    if (contcarta == 0)
+    {
+        std::cout << "Nenhuma carta dessa raridade foi encontrada no deck" << std::endl;
+        return sinal = true;
+    }
+    else
+    {
+        std::cout << "Cartas Encontradas: " << std::endl;
+        for (int i = 0; i < contcarta; i++)
+        {
+            ImprimirCarta(CartasEncontradas[i]);
+            std::cout << "Posicao: " << posicao[i] + 1 << std::endl;
+        }
+    }
+
+    std::cout << "\nEscolha uma carta para fazer a alteracao na posicao posterior: " << std::endl;
+    std::cin >> k;
+    int l = VerificacaoString(k);
+    int alterada = posicao[l - 1] + 1;
+    std::cout << "Deseja continuar com a alteracao da carta: " << std::endl;
+    ImprimirCarta(deck.CartasDoDeck[alterada]);
+    std::cout << "(S/n)?" << std::endl;
+    std::cin >> conf;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    if (conf == 'S')
+    {
+        std::cout << "Digite o nome da nova carta: " << std::endl;
+        std::getline(std::cin, k);
+        json novacarta = ProcurarCarta(listadecartas, k);
+        deck.CartasDoDeck[alterada] = novacarta;
+        CalculaPeso(deck);
+        ImprimirDeck(deck);
+        sinal = true;
+        return sinal;
+    }
+    else
+    {
+        std::cout << "Alteracao negada" << std::endl;
+        return sinal;
+    }
+}
+
 int main()
 
 {
-    int op;
+    std::string op;
     json listaDeCartas = CarregarCartas();
     Deck bait = GerarLogBait(listaDeCartas);
+    Deck besta = GerarXBesta(listaDeCartas);
     std::cout << "======================================================================" << std::endl;
     std::cout << "          Bem vindo ao gerenciador de decks do Clash Royale           " << std::endl;
     std::cout << "======================================================================" << std::endl;
@@ -539,15 +617,31 @@ int main()
     std::cout << "13) Classificar um deck por ordem crescente de raridade" << std::endl;
     std::cin >> op;
 
-    switch (op)
+    switch (std::stoi(op))
     {
     case 1:
-        std::cout << "\n"
-                  << std::endl;
-        std::cout << "Escolha o deck para realizar a acao" << std::endl;
-        std::cout << "\n"
-                  << std::endl;
+        system("cls");
+        std::cout << "\nEscolha o deck que deseja executar a acao: " << std::endl;
+        std::cout << "------------------------------" << std::endl;
+        for (int i = 0; i < contDeck; i++)
+        {
+            std::cout << "Deck " << i + 1 << ": " << listaDeck[i].nome << std::endl;
+        }
+        std::cout << "------------------------------" << std::endl;
+
         break;
+
+    case 5:
+        system("cls");
+        std::cout << "\n"
+                  << std::endl;
+        Imprimir7(listaDeCartas);
+        break;
+    case 6:
+        system("cls");
+        std::cout << "\n"
+                  << std::endl;
+        Raridade(bait, listaDeCartas);
 
     default:
         break;
