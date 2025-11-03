@@ -469,13 +469,6 @@
     "tipo": "f"
   },
   {
-    "id": 68,
-    "nome": "espelho",
-    "raridade": "epica",
-    "elixir": "0",
-    "tipo": "f"
-  },
-  {
     "id": 69,
     "nome": "barril de goblins",
     "raridade": "epica",
@@ -485,7 +478,7 @@
   {
     "id": 70,
     "nome": "gangue de goblins",
-    "raridade": "epica",
+    "raridade": "comum",
     "elixir": 3,
     "tipo": "t"
   },
@@ -712,5 +705,40 @@
     "raridade": "epica",
     "elixir": 2,
     "tipo": "f"
+  },
+   {
+    "id": 103,
+    "nome": "torre de bombas",
+    "raridade": "rara",
+    "elixir": 4,
+    "tipo": "c"
+  },
+    {
+    "id": 104,
+    "nome": "bebe dragao",
+    "raridade": "epica",
+    "elixir": 4,
+    "tipo": "t"
+  },
+    {
+    "id": 105,
+    "nome": "vinhas",
+    "raridade": "epica",
+    "elixir": 3,
+    "tipo": "f"
+  },
+   {
+    "id": 106,
+    "nome": "golem de elixir",
+    "raridade": "rara",
+    "elixir": 3,
+    "tipo": "t"
+  },
+   {
+    "id": 107,
+    "nome": "pirotecnica",
+    "raridade": "comum",
+    "elixir": 3,
+    "tipo": "t"
   }
 ]

@@ -34,7 +34,7 @@
 			"options": {
 				"cwd": "${fileDirname}"
 			},
-			"group": {
+			"group": { 
 				"kind": "test",
 				"isDefault": true
 			},
