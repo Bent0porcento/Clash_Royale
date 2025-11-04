@@ -235,7 +235,7 @@
     "nome": "fornalha",
     "raridade": "rara",
     "elixir": 4,
-    "tipo": "c"
+    "tipo": "t"
   },
   {
     "id": 35,
@@ -295,8 +295,8 @@
   },
   {
     "id": 43,
-    "nome": "domadora de cordeiro",
-    "raridade": "rara",
+    "nome": "domadora de carneiro",
+    "raridade": "lendaria",
     "elixir": 5,
     "tipo": "t"
   },
@@ -484,7 +484,7 @@
   },
   {
     "id": 71,
-    "nome": "guarda",
+    "nome": "guardas",
     "raridade": "epica",
     "elixir": 3,
     "tipo": "t"
@@ -499,7 +499,7 @@
   {
     "id": 73,
     "nome": "jaula de goblin",
-    "raridade": "epica",
+    "raridade": "rara",
     "elixir": 4,
     "tipo": "c"
   },
@@ -512,7 +512,7 @@
   },
   {
     "id": 75,
-    "nome": "broca de goblin",
+    "nome": "broca goblin",
     "raridade": "epica",
     "elixir": 4,
     "tipo": "c"
@@ -739,6 +739,118 @@
     "nome": "pirotecnica",
     "raridade": "comum",
     "elixir": 3,
+    "tipo": "t"
+  },
+    {
+    "id": 108,
+    "nome": "dragao eletrico",
+    "raridade": "epica",
+    "elixir": 5,
+    "tipo": "t"
+  },
+    {
+    "id": 109,
+    "nome": "berserker",
+    "raridade": "comum",
+    "elixir": 2,
+    "tipo": "t"
+  },
+      {
+    "id": 110,
+    "nome": "barril de esqueletos",
+    "raridade": "comum",
+    "elixir": 3,
+    "tipo": "t"
+  },
+        {
+    "id": 111,
+    "nome": "dargoes esqueleto",
+    "raridade": "comum",
+    "elixir": 4,
+    "tipo": "t"
+  },
+        {
+    "id": 112,
+    "nome": "patifes",
+    "raridade": "comum",
+    "elixir": 5,
+    "tipo": "t"
+  },
+        {
+    "id": 113,
+    "nome": "espirito de cura",
+    "raridade": "raro",
+    "elixir": 1,
+    "tipo": "t"
+  },
+        {
+    "id": 114,
+    "nome": "eletrocutadores",
+    "raridade": "rara",
+    "elixir": 4,
+    "tipo": "t"
+  },
+    {
+    "id": 115,
+    "nome": "goblin demolidor",
+    "raridade": "rara",
+    "elixir": 4,
+    "tipo": "t"
+  },
+    {
+    "id": 116,
+    "nome": "vacuo",
+    "raridade": "epica",
+    "elixir": 3,
+    "tipo": "f"
+  },
+    {
+    "id": 117,
+    "nome": "gigante das runas",
+    "raridade": "epica",
+    "elixir": 4,
+    "tipo": "t"
+  },
+    {
+    "id": 118,
+    "nome": "gigante eletrico",
+    "raridade": "epica",
+    "elixir": 7,
+    "tipo": "t"
+  },
+    {
+    "id": 119,
+    "nome": "bruxa sombria",
+    "raridade": "lendaria",
+    "elixir": 4,
+    "tipo": "t"
+  },
+    {
+    "id": 120,
+    "nome": "maquina goblin",
+    "raridade": "lendaria",
+    "elixir": 5,
+    "tipo": "t"
+  },
+    {
+    "id": 121,
+    "nome": "imperatriz espiritual",
+    "raridade": "lendaria",
+    "elixir": 6,
+    "tipo": "t"
+  },
+    {
+    "id": 122,
+    "nome": "goblineinstein",
+    "raridade": "campeao",
+    "elixir": 5,
+    "tipo": "t"
+  },
+    {
+    "id": 123,
+    "nome": "bandida lider",
+    "raridade": "campeao",
+    "elixir": 6,
     "tipo": "t"
   }
 ]

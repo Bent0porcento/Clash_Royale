@@ -1,0 +1,26 @@
+[
+    {
+    "id": 1,
+    "nome": "princesa da torre",
+    "raridade": "comum",
+    "hp": 3052
+    },
+    {
+    "id": 2,
+    "nome": "canhoneiro",
+    "raridade": "epica",
+    "hp": 2616
+    },
+    {
+    "id": 3,
+    "nome": "duquesa das adagas",
+    "raridade": "lendaria",
+    "hp": 2768
+    },
+    {
+    "id": 4,
+    "nome": "cozinheiro real",
+    "raridade": "lendaria",
+    "hp": 2703
+    }
+]
