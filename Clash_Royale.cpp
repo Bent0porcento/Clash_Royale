@@ -194,7 +194,6 @@ Deck deckgenerico;
 
 Deck EscolherDeck()
 {
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::string escolha;
     int op;
 
@@ -207,6 +206,7 @@ Deck EscolherDeck()
     }
 
     std::cout << "------------------------------" << std::endl;
+
     std::getline(std::cin, escolha);
     op = VerificacaoString(escolha);
 
@@ -236,7 +236,7 @@ void ImprimirDeck(Deck &deck) // pede um deck e imprime as informações dele
             std::cout << "Carta " << i + 1 << ": X" << std::endl;
         }
     }
-    std::cout << "Tropa de Torre: " << deck.torre["nome"].get<std::string>() << std::endl;
+    std::cout << "\nTropa de Torre: " << deck.torre["nome"].get<std::string>() << std::endl;
     std::cout << "Peso: " << deck.peso << std::endl;
     std::cout << "=============================================================" << std::endl;
 }
@@ -578,12 +578,13 @@ bool RemoverEmK(Deck &deck)
     if (conf == 'S')
     {
         aux = k - 1;
-        while (aux <= deck.final)
+        while (aux < deck.final)
         {
             deck.CartasDoDeck[aux] = deck.CartasDoDeck[aux + 1];
             aux++;
         }
         deck.final--;
+        deck.CartasDoDeck[deck.final + 1] = json();
         sinal = true;
         CalculaPeso(deck);
         ImprimirDeck(deck);
@@ -775,6 +776,7 @@ bool imprimirNoAnterior(Deck &deck, const json &listadecartas)
     std::cout << "Carta encontrada!" << std::endl;
     std::cout << "Imprimindo conteudo da carta anterior: " << std::endl;
     ImprimirCarta(deck.CartasDoDeck[k - 1]);
+    return true;
 }
 
 void Imprimir7(const json &listadecartas)
@@ -1029,6 +1031,7 @@ bool ClassificarNome(Deck &deck)
     std::cout << "\nDeck apos classificacao: " << std::endl;
     ImprimirDeck(deck);
     InserirDeck(deck);
+    return sinal;
 }
 
 void GerarDecksProntos(const json &listadecartas, const json &torre)
@@ -1143,6 +1146,7 @@ bool ClassicarRaridade(Deck &deck)
     std::cout << "\nDeck apos classificacao: " << std::endl;
     ImprimirDeckcomRaridade(deck);
     InserirDeck(deck);
+    return sinal;
 }
 
 bool InserirK2(const json &listadecartas)
@@ -1338,6 +1342,8 @@ int GerarInterface()
             deckgenerico = EscolherDeck();
             ImprimirDeck(deckgenerico);
             RemoverEmK(deckgenerico);
+            std::cin.get();
+
             break;
 
         case 2:
