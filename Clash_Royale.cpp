@@ -32,6 +32,29 @@ json CarregarCartas()
     return dados_cartas; // retona pra gente o dodos_cartas, equivalente a lista de cartas
 }
 
+json CarregarTorres()
+{
+    std::ifstream arquivo_json("cartastorre.json"); // abrir o json
+
+    if (!arquivo_json.is_open()) // verificar se deu certo a abertura
+    {
+        std::cerr << "Erro: Nao foi possivel abrir o arquivo cartas.json" << std::endl;
+        return json();
+    }
+
+    json dados_cartas; // parsear as cartas
+    try
+    {
+        arquivo_json >> dados_cartas; // le os dados pra colocar na nossa variavel dados_cartas
+    }
+    catch (json::parse_error &e) // verificacao para erro na hora do parse
+    {
+        std::cerr << "Erro de parse no JSON: " << e.what() << std::endl;
+        return json();
+    }
+    return dados_cartas; // retona pra gente o dodos_cartas, equivalente a lista de cartas
+}
+
 void ImprimirCarta(const json &carta)
 {
     std::cout << "============================================================" << std::endl;
@@ -158,6 +181,7 @@ struct Deck
     std::string nome;
     double peso;
     int final = -1;
+    json torre;
 };
 
 Deck listaDeck[10];
@@ -170,7 +194,7 @@ Deck deckgenerico;
 
 Deck EscolherDeck()
 {
-
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::string escolha;
     int op;
 
@@ -181,7 +205,6 @@ Deck EscolherDeck()
 
         std::cout << "Deck " << i + 1 << ": " << listaDeck[i].nome << std::endl;
     }
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     std::cout << "------------------------------" << std::endl;
     std::getline(std::cin, escolha);
@@ -213,6 +236,7 @@ void ImprimirDeck(Deck &deck) // pede um deck e imprime as informações dele
             std::cout << "Carta " << i + 1 << ": X" << std::endl;
         }
     }
+    std::cout << "Tropa de Torre: " << deck.torre["nome"].get<std::string>() << std::endl;
     std::cout << "Peso: " << deck.peso << std::endl;
     std::cout << "=============================================================" << std::endl;
 }
@@ -307,8 +331,10 @@ json VerificarRepitida(std::string nome, Deck &novodeck, const json &listadecart
     return novaCarta;
 }
 
-Deck CriarDeck(const json &listadecarta) // passa a lista de carta e começa o processo pra criar o deck
+Deck CriarDeck(const json &listadecarta, const json &torres) // passa a lista de carta e começa o processo pra criar o deck
 {
+    std::string escolha;
+    int op;
     Deck novodeck;
     novodeck.final = -1;
 
@@ -324,6 +350,29 @@ Deck CriarDeck(const json &listadecarta) // passa a lista de carta e começa o p
         novodeck.CartasDoDeck[i] = cartaValidada;
         novodeck.final = i;
     }
+    std::cout << "\nQual torre gostaria de usar em seu deck?" << std::endl;
+    std::cout << "1) Princesa da Torre" << std::endl;
+    std::cout << "2) Canhoneiro" << std::endl;
+    std::cout << "3) Duquesa das Adagas" << std::endl;
+    std::cout << "4) Cozinhiero real" << std::endl;
+    std::getline(std::cin, escolha);
+    op = VerificacaoString(escolha);
+    while (true)
+    {
+        if (op < 1 || op > 4)
+        {
+            std::cout << "Digite um numero de 1 a 4" << std::endl;
+            std::getline(std::cin, escolha);
+            op = VerificacaoString(escolha);
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    json torre = torres[op - 1];
+    novodeck.torre = torre;
     CalculaPeso(novodeck);
     ImprimirDeck(novodeck);
     std::cout << "Como gostaria de chamar seu novo deck?" << std::endl;
@@ -345,7 +394,15 @@ void InserirDeck(Deck &deck)
     }
 }
 
-Deck GerarLogBait(const json &listadecartas)
+enum Torre
+{
+    PRINCESA,
+    CANHONEIRO,
+    DUQUESA,
+    COZINHEIRO
+};
+
+Deck GerarLogBait(const json &listadecartas, const json &torre)
 {
     Deck logbait;
     logbait.CartasDoDeck[0] = ProcurarCarta(listadecartas, "cavaleiro");
@@ -356,6 +413,7 @@ Deck GerarLogBait(const json &listadecartas)
     logbait.CartasDoDeck[5] = ProcurarCarta(listadecartas, "princesa");
     logbait.CartasDoDeck[6] = ProcurarCarta(listadecartas, "gangue de goblins");
     logbait.CartasDoDeck[7] = ProcurarCarta(listadecartas, "espirito de gelo");
+    logbait.torre = torre[PRINCESA];
     logbait.final = TamanhoDeck - 1;
     logbait.nome = "LogBait";
     CalculaPeso(logbait);
@@ -365,7 +423,7 @@ Deck GerarLogBait(const json &listadecartas)
     return logbait;
 }
 
-Deck GerarXBesta(const json &listadecartas)
+Deck GerarXBesta(const json &listadecartas, const json &torre)
 {
     Deck Xbesta;
     Xbesta.CartasDoDeck[0] = ProcurarCarta(listadecartas, "cavaleiro");
@@ -376,6 +434,7 @@ Deck GerarXBesta(const json &listadecartas)
     Xbesta.CartasDoDeck[5] = ProcurarCarta(listadecartas, "foguete");
     Xbesta.CartasDoDeck[6] = ProcurarCarta(listadecartas, "esqueletos");
     Xbesta.CartasDoDeck[7] = ProcurarCarta(listadecartas, "tornado");
+    Xbesta.torre = torre[PRINCESA];
     Xbesta.final = TamanhoDeck - 1;
     Xbesta.nome = "X-Besta";
     CalculaPeso(Xbesta);
@@ -385,7 +444,7 @@ Deck GerarXBesta(const json &listadecartas)
     return Xbesta;
 }
 
-Deck GerarGGreal(const json &listadecartas)
+Deck GerarGGreal(const json &listadecartas, const json &torre)
 {
     Deck GG;
     GG.CartasDoDeck[0] = ProcurarCarta(listadecartas, "gigante real");
@@ -396,6 +455,7 @@ Deck GerarGGreal(const json &listadecartas)
     GG.CartasDoDeck[5] = ProcurarCarta(listadecartas, "fenix");
     GG.CartasDoDeck[6] = ProcurarCarta(listadecartas, "goblins");
     GG.CartasDoDeck[7] = ProcurarCarta(listadecartas, "relampago");
+    GG.torre = torre[COZINHEIRO];
     GG.final = TamanhoDeck - 1;
     GG.nome = "Gigante Real";
     CalculaPeso(GG);
@@ -405,7 +465,7 @@ Deck GerarGGreal(const json &listadecartas)
     return GG;
 }
 
-Deck GerarSplash(const json &listadecartas)
+Deck GerarSplash(const json &listadecartas, const json &torre)
 {
     Deck Splash;
     Splash.CartasDoDeck[0] = ProcurarCarta(listadecartas, "cabana de goblins");
@@ -416,6 +476,7 @@ Deck GerarSplash(const json &listadecartas)
     Splash.CartasDoDeck[5] = ProcurarCarta(listadecartas, "barril de barbaro");
     Splash.CartasDoDeck[6] = ProcurarCarta(listadecartas, "bebe dragao");
     Splash.CartasDoDeck[7] = ProcurarCarta(listadecartas, "vinhas");
+    Splash.torre = torre[CANHONEIRO];
     Splash.final = TamanhoDeck - 1;
     Splash.nome = "SplashYard";
     CalculaPeso(Splash);
@@ -425,7 +486,7 @@ Deck GerarSplash(const json &listadecartas)
     return Splash;
 }
 
-Deck GerarHog(const json &listadecartas)
+Deck GerarHog(const json &listadecartas, const json &torre)
 {
     Deck hog;
     hog.CartasDoDeck[0] = ProcurarCarta(listadecartas, "espirito de gelo");
@@ -436,6 +497,7 @@ Deck GerarHog(const json &listadecartas)
     hog.CartasDoDeck[5] = ProcurarCarta(listadecartas, "o tronco");
     hog.CartasDoDeck[6] = ProcurarCarta(listadecartas, "mosqueteira");
     hog.CartasDoDeck[7] = ProcurarCarta(listadecartas, "bola de fogo");
+    hog.torre = torre[PRINCESA];
     hog.final = TamanhoDeck - 1;
     hog.nome = "Hog 2.6";
     CalculaPeso(hog);
@@ -445,7 +507,7 @@ Deck GerarHog(const json &listadecartas)
     return hog;
 }
 
-Deck GerarGalego(const json &listadecartas)
+Deck GerarGalego(const json &listadecartas, const json &torre)
 {
     Deck ga;
     ga.CartasDoDeck[0] = ProcurarCarta(listadecartas, "golem de elixir");
@@ -456,6 +518,7 @@ Deck GerarGalego(const json &listadecartas)
     ga.CartasDoDeck[5] = ProcurarCarta(listadecartas, "bombardeiro");
     ga.CartasDoDeck[6] = ProcurarCarta(listadecartas, "pirotecnica");
     ga.CartasDoDeck[7] = ProcurarCarta(listadecartas, "mega cavaleiro");
+    ga.torre = torre[PRINCESA];
     ga.final = TamanhoDeck - 1;
     ga.nome = "Hog 2.6";
     CalculaPeso(ga);
@@ -968,7 +1031,7 @@ bool ClassificarNome(Deck &deck)
     InserirDeck(deck);
 }
 
-void GerarDecksProntos(const json &listadecartas)
+void GerarDecksProntos(const json &listadecartas, const json &torre)
 {
     std::string escolha;
     int op;
@@ -992,32 +1055,32 @@ void GerarDecksProntos(const json &listadecartas)
     switch (op)
     {
     case 1:
-        GerarXBesta(listadecartas);
+        GerarXBesta(listadecartas, torre);
         std::cout << "Opcao escolhida!" << std::endl;
         std::cout << "Deck de X-besta gerado!" << std::endl;
         break;
     case 2:
-        GerarLogBait(listadecartas);
+        GerarLogBait(listadecartas, torre);
         std::cout << "Opcao escolhida!" << std::endl;
         std::cout << "Deck de Log Bait gerado!" << std::endl;
         break;
     case 3:
-        GerarGGreal(listadecartas);
+        GerarGGreal(listadecartas, torre);
         std::cout << "Opcao escolhida!" << std::endl;
         std::cout << "Deck de Gigante Real gerado!" << std::endl;
         break;
     case 4:
-        GerarSplash(listadecartas);
+        GerarSplash(listadecartas, torre);
         std::cout << "Opcao escolhida!" << std::endl;
         std::cout << "Deck de SplashYard gerado!" << std::endl;
         break;
     case 5:
-        GerarHog(listadecartas);
+        GerarHog(listadecartas, torre);
         std::cout << "Opcao escolhida!" << std::endl;
         std::cout << "Deck de 2.6 gerado!" << std::endl;
         break;
     case 6:
-        GerarGalego(listadecartas);
+        GerarGalego(listadecartas, torre);
         std::cout << "Opcao escolhida!" << std::endl;
         std::cout << "Deck do  Peitinho do Galego gerado!" << std::endl;
         break;
@@ -1221,6 +1284,7 @@ int GerarInterface()
 {
     int op;
     json listaDeCartas = CarregarCartas();
+    json torres = CarregarTorres();
 
     while (true)
     {
@@ -1326,7 +1390,6 @@ int GerarInterface()
             {
                 std::cout << "Escolha entre 1 e 2:" << std::endl;
             }
-            std::cin.get();
             break;
         }
 
@@ -1353,11 +1416,11 @@ int GerarInterface()
             break;
 
         case 14:
-            CriarDeck(listaDeCartas);
+            CriarDeck(listaDeCartas, torres);
             break;
 
         case 15:
-            GerarDecksProntos(listaDeCartas);
+            GerarDecksProntos(listaDeCartas, torres);
 
             break;
 
@@ -1382,6 +1445,5 @@ int main()
 
 {
     GerarInterface();
-
     return 0;
 }
